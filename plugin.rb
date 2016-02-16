@@ -77,7 +77,15 @@ class OAuth2BasicAuthenticator < ::Auth::OAuth2Authenticator
     if current_info
       result.user = User.where(id: current_info[:user_id]).first
     elsif SiteSetting.oauth2_email_verified?
-      result.user = User.where(email: Email.downcase(result.email)).first
+      result.user =
+        if SiteSetting.oauth2_auto_create_user?
+          User.create_with(
+            username: result.username,
+            active: true
+          ).find_or_create_by(email: result.email)
+        else
+          User.where(email: Email.downcase(result.email)).first
+        end
     end
 
     result.extra_data = { oauth2_basic_user_id: user_details[:user_id] }
