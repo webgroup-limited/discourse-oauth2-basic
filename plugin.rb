@@ -94,6 +94,24 @@ auth_provider title_setting: "oauth2_button_title",
               authenticator: OAuth2BasicAuthenticator.new('oauth2_basic'),
               message: "OAuth2"
 
+after_initialize do
+  auth_providers.each do |auth|
+    # SiteSetting unavailable before Framework initialize (constant undefined,
+    # ActiveRecord connection not configured)
+    width = SiteSetting.frame_width
+    height = SiteSetting.frame_height
+
+    auth.frame_width = width if width.present?
+    auth.frame_height = height if height.present?
+  end
+
+  # Assets are generated before `after_initialize` callback
+  # (`Discourse.activate_plugin!` in config/application.rb).
+  #
+  # => re-generate it, with new frame dimension settings.
+  generate_automatic_assets!
+end
+
 register_css <<CSS
 
   button.btn-social.oauth2_basic {
