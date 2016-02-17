@@ -2,6 +2,8 @@ login:
   oauth2_enabled:
     default: false
     client: true
+  oauth2_frame_width: ''
+  oauth2_frame_height: ''
   oauth2_client_id: ''
   oauth2_client_secret: ''
   oauth2_authorize_url: ''
